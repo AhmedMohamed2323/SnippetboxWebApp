@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"runtime/debug"
-	"time" // New import
+	"time" // new import
 )
 
 // The serverError helper writes an error message and stack trace to the errorLog,
@@ -33,8 +33,6 @@ func (app *application) notFound(w http.ResponseWriter) {
 
 // Create an addDefaultData helper. This takes a pointer to a templateData
 // struct, adds the current year to the CurrentYear field, and then returns
-// Create an addDefaultData helper. This takes a pointer to a templateData
-// struct, adds the current year to the CurrentYear field, and then returns
 // the pointer. Again, we're not using the *http.Request parameter at the
 // moment, but we will do later in the book.
 func (app *application) addDefaultData(td *templateData, r *http.Request) *templateData {
@@ -44,8 +42,6 @@ func (app *application) addDefaultData(td *templateData, r *http.Request) *templ
 	td.CurrentYear = time.Now().Year()
 	return td
 }
-
-//
 
 func (app *application) render(w http.ResponseWriter, r *http.Request, name string, td *templateData) {
 	ts, ok := app.templateCache[name]
