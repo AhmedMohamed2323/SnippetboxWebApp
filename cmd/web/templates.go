@@ -2,15 +2,18 @@ package main
 
 import (
 	"html/template" // New import
+	"net/url"       // New import
 	"path/filepath" // New import
 	"time"          // new import
 
 	"webapp.net/snippetbox/pkg/models"
 )
 
-// Include a Snippets field in the templateData struct.
+// Add FormData and FormErrors fields to the templateData struct.
 type templateData struct {
 	CurrentYear int
+	FormData    url.Values
+	FormErrors  map[string]string
 	Snippet     *models.Snippet
 	Snippets    []*models.Snippet
 }
