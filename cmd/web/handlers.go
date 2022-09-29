@@ -10,7 +10,6 @@ import (
 	"webapp.net/snippetbox/pkg/models" // New import
 )
 
-
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// Because Pat matches the "/" path exactly, we can now remove the manual check
 	// of r.URL.Path != "/" from this handler.
@@ -43,19 +42,10 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Use the PopString() method to retrieve the value for the "flash" key.
-	// PopString() also deletes the key and value from the session data, so it
-	// acts like a one-time fetch. If there is no matching key in the session
-	// data this will return the empty string.
-	flash := app.session.PopString(r, "flash")
-
-	// Pass the flash message to the template.
 	app.render(w, r, "show.page.tmpl", &templateData{
-		Flash:   flash,
 		Snippet: s,
 	})
 }
-
 
 func (app *application) createSnippetForm(w http.ResponseWriter, r *http.Request) {
 	app.render(w, r, "create.page.tmpl", &templateData{
@@ -63,7 +53,6 @@ func (app *application) createSnippetForm(w http.ResponseWriter, r *http.Request
 		Form: forms.New(nil),
 	})
 }
-
 
 func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
