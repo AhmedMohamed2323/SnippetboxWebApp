@@ -17,13 +17,14 @@ import (
 	"github.com/golangcollege/sessions" // New import
 )
 
-// Add a templateCache field to the application struct.
+// Add a new users field to the application struct.
 type application struct {
 	errorLog      *log.Logger
 	infoLog       *log.Logger
 	session       *sessions.Session
 	snippets      *mysql.SnippetModel
 	templateCache map[string]*template.Template
+	users         *mysql.UserModel
 }
 
 func main() {
@@ -56,13 +57,15 @@ func main() {
 	session.Lifetime = 12 * time.Hour
 	session.Secure = true // Set the Secure flag on our session cookies
 
-	// And add the session manager to our application dependencies.
+	// Initialize a mysql.UserModel instance and add it to the application
+	// dependencies.
 	app := &application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
 		session:       session,
 		snippets:      &mysql.SnippetModel{DB: db},
 		templateCache: templateCache,
+		users:         &mysql.UserModel{DB: db},
 	}
 
 	// Initialize a tls.Config struct to hold the non-default TLS settings we want
