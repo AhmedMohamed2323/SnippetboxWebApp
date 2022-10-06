@@ -1,9 +1,9 @@
 package main
 
 import (
-	"bytes" //
+	"bytes" // New import
 	"net/http"
-	"net/url"
+	"net/url" // New import
 	"testing"
 )
 
@@ -22,8 +22,6 @@ func TestPing(t *testing.T) {
 		t.Errorf("want body to equal %q", "OK")
 	}
 }
-
-//
 
 func TestShowSnippet(t *testing.T) {
 	// Create a new instance of our application struct which uses the mocked
@@ -65,8 +63,6 @@ func TestShowSnippet(t *testing.T) {
 		})
 	}
 }
-
-//
 
 func TestSignupUser(t *testing.T) {
 	app := newTestApplication(t)
