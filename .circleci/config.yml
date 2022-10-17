@@ -47,9 +47,10 @@ jobs:
           name: Lint the Go pkg/
           command: gofmt -d ./pkg
   unit-tests:
-    executor: go_docker
+    executor: machine_no_dlc
     steps:
       - checkout
+      - start_container_and_verify
       - run:
           name: Run cmd/web Go unit tests
           command: go test ./cmd/web
