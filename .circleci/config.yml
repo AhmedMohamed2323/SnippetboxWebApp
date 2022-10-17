@@ -21,32 +21,7 @@ executors:
           username: $DOCKER_USERNAME
           password: $DOCKER_PASS
 
-commands:
-  build_container:
-    description: Start container and verify
-    steps:
-      - run:
-          name: Build container
-          command: |
-            echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
-            docker-compose build
-  start_container:
-    description: Start container
-    steps:
-      - run:
-          name: Start container
-          command: |
-            echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
-            docker-compose up -d
-
-
 jobs:
-  build:
-    executor: machine_no_dlc
-    steps:
-      - checkout
-      - build_container
-
   lint:
     executor: go_docker
     steps:
@@ -108,15 +83,13 @@ jobs:
 
 workflows:
   version: 2
-  build-test-and-deploy:
+  test-and-deploy:
     jobs:
       - lint
       # - code-coverage
       - go-static-analyzer
-      - build
       - unit-tests:
           requires:
-            - build
             - lint
             - go-static-analyzer
       - cypress/run:
@@ -125,7 +98,6 @@ workflows:
           start: docker-compose up -d
           wait-on: https://localhost:4000
           requires:
-            - build
             - lint
             - go-static-analyzer
       - deploy:
@@ -136,4 +108,5 @@ workflows:
             branches:
               only:
                 - main
+
 
