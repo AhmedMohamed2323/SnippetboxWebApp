@@ -30,17 +30,17 @@ commands:
           command: |
             echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
             docker-compose build
-  start_container_and_verify:
-    description: Start container and verify
+  start_app:
+    description: Start app
     steps:
       - run:
-          name: Start container and verify
+          name: Start app
           command: |
             echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
             docker-compose up -d
 jobs:
   build:
-    executor: machine_no_dlc
+    executor: machine_with_dlc
     steps:
       - checkout
       - build_container
@@ -56,15 +56,15 @@ jobs:
           name: Lint the Go pkg/
           command: gofmt -d ./pkg
   unit-tests:
-    executor: machine_no_dlc
+    executor: machine_with_dlc
     steps:
       - checkout
       - run: mkdir /tmp/code_coverage/
-      - start_container_and_verify
+      - start_app
       - run: 
           name: Run cmd/web Go unit tests with coverage
           command: |
-              until [ 'docker inspect -f {{.State.Running}} database', true ]
+              until docker inspect -f {{.State.Running}} database
               do sleep 10
               done
       - run:
@@ -118,7 +118,7 @@ workflows:
             - lint
             - go-static-analyzer
       - cypress/run:
-          executor: machine_no_dlc
+          executor: machine_with_dlc
           store_artifacts: true
           start: docker-compose up -d
           wait-on: https://localhost:4000
