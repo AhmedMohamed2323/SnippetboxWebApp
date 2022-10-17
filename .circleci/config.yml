@@ -1,50 +1,10 @@
 version: 2.1
 
 orbs:
-  aws-ecr: circleci/aws-ecr@7.2.0
-  slack: circleci/slack@4.4.4
-  go: circleci/go@1.7.0
   cypress: cypress-io/cypress@1.29.0
 
-executors:
-  machine_no_dlc:
-    machine:
-      image: ubuntu-2004:202107-02
-  machine_with_dlc:
-    machine:
-      image: ubuntu-2004:202107-02
-      docker_layer_caching: true
-  go_docker:
-    docker:
-      - image: cimg/go:1.17.1
-        auth: 
-          username: $DOCKER_USERNAME
-          password: $DOCKER_PASS
 
-commands:
-  build_container:
-    description: Start container and verify
-    steps:
-      - run:
-          name: Build container
-          command: |
-            echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
-            docker-compose build
-  start_app:
-    description: Start app
-    steps:
-      - run:
-          name: Start app
-          command: |
-            echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
-            docker-compose up -d
 jobs:
-  build:
-    executor: machine_with_dlc
-    steps:
-      - checkout
-      - build_container
-
   lint:
     executor: go_docker
     steps:
@@ -72,16 +32,16 @@ jobs:
           command: go test -v ./cmd/web -coverprofile=/tmp/code_coverage/profile.out ./...
       - store_artifacts:
           path: /tmp/code_coverage/profile.out
-  # code-coverage:
-  #   executor: go_docker
-  #   steps:
-  #     - checkout
-  #     - run: mkdir /tmp/code_coverage/
-  #     - run:
-  #         name: Run code coverage
-  #         command: go test -coverprofile=/tmp/code_coverage/profile.out ./...
-  #     - store_artifacts:
-  #         path: /tmp/code_coverage/profile.out
+  code-coverage:
+     executor: go_docker
+     steps:
+       - checkout
+       - run: mkdir /tmp/code_coverage/
+       - run:
+           name: Run code coverage
+           command: go test -coverprofile=/tmp/code_coverage/profile.out ./...
+       - store_artifacts:
+           path: /tmp/code_coverage/profile.out
   go-static-analyzer:
     executor: go_docker
     steps:
@@ -96,25 +56,17 @@ jobs:
                     go vet ./pkg/models
                     go vet ./pkg/models/mock
                     go vet ./pkg/models/mysql
-  deploy:
-    executor: machine_no_dlc
-    steps:
-      # - push-image:
-      #   - setup-remote-docker
-      #   - repo: #todo create context
-      - run: echo I'm going to deploy I promise
+ 
 
 workflows:
   version: 2
-  build-test-and-deploy:
+  test-deploy:
     jobs:
       - lint
-      # - code-coverage
+      - code-coverage
       - go-static-analyzer
-      - build
       - unit-tests:
           requires:
-            - build
             - lint
             - go-static-analyzer
       - cypress/run:
@@ -123,7 +75,6 @@ workflows:
           start: docker-compose up -d
           wait-on: https://localhost:4000
           requires:
-            - build
             - lint
             - go-static-analyzer
       - deploy:
