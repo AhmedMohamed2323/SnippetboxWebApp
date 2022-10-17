@@ -119,7 +119,7 @@ workflows:
             - build
             - lint
             - go-static-analyzer
-      - cypress/run:
+      - cypress/run: 
           executor: machine_no_dlc
           store_artifacts: true
           start: docker-compose up -d
