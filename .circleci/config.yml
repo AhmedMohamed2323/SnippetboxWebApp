@@ -15,8 +15,8 @@ executors:
     docker:
       - image: cimg/go:1.17.1
         auth: 
-          username: $DOCKER_USERNAME
-          password: $DOCKER_PASS
+          username: ahmedmo23
+          password: Waterbreak2323!
 
 commands:
   start_container_and_verify:
