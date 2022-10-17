@@ -1,6 +1,9 @@
 version: 2.1
 
 orbs:
+  aws-ecr: circleci/aws-ecr@7.2.0
+  slack: circleci/slack@4.4.4
+  go: circleci/go@1.7.0
   cypress: cypress-io/cypress@1.29.0
 
 executors:
@@ -18,7 +21,30 @@ executors:
           username: $DOCKER_USERNAME
           password: $DOCKER_PASS
 
+commands:
+  build_container:
+    description: Start container and verify
+    steps:
+      - run:
+          name: Build container
+          command: |
+            echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
+            docker-compose build
+  start_container_and_verify:
+    description: Start container and verify
+    steps:
+      - run:
+          name: Start container and verify
+          command: |
+            echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
+            docker-compose up -d
 jobs:
+  build:
+    executor: machine_no_dlc
+    steps:
+      - checkout
+      - build_container
+
   lint:
     executor: go_docker
     steps:
@@ -34,11 +60,11 @@ jobs:
     steps:
       - checkout
       - run: mkdir /tmp/code_coverage/
-      - start_container
+      - start_container_and_verify
       - run: 
-          name: Verify database up
+          name: Run cmd/web Go unit tests with coverage
           command: |
-              until [ docker inspect -f {{.State.Running}} database ]
+              until [ 'docker inspect -f {{.State.Running}} database', true ]
               do sleep 10
               done
       - run:
@@ -80,13 +106,15 @@ jobs:
 
 workflows:
   version: 2
-  test-and-deploy:
+  build-test-and-deploy:
     jobs:
       - lint
       # - code-coverage
       - go-static-analyzer
+      - build
       - unit-tests:
           requires:
+            - build
             - lint
             - go-static-analyzer
       - cypress/run:
@@ -95,6 +123,7 @@ workflows:
           start: docker-compose up -d
           wait-on: https://localhost:4000
           requires:
+            - build
             - lint
             - go-static-analyzer
       - deploy:
