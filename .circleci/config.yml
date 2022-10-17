@@ -25,7 +25,7 @@ commands:
       - run:
           name: Start container and verify
           command: |
-            docker login -u $DOCKER_USERNAME -p $DOCKER_PASS
+            echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
             docker-compose up -d
             docker run --network container:snippet \
               appropriate/curl --retry 10 --retry-delay 1 --retry-connrefused http://localhost:4000 |
@@ -76,7 +76,7 @@ jobs:
                     go vet ./pkg/forms
                     go vet ./pkg/models
                     go vet ./pkg/models/mock
-                    go vet ./pkg/models/mysql 
+                    go vet ./pkg/models/mysql
   deploy:
     executor: machine_no_dlc
     steps:
@@ -111,4 +111,3 @@ workflows:
             branches:
               only:
                 - main
-
