@@ -1,0 +1,22 @@
+version: '3'
+services:
+  db:
+    container_name: database
+    build: ./docker/db/
+    environment: 
+      MYSQL_ROOT_PASSWORD: Balle23!
+      MYSQL_DATABASE: snippetbox
+      MYSQL_USER: web
+      MYSQL_PASSWORD: hithere
+    restart: on-failure
+  app:
+    container_name: snippetbox
+    build:
+      context: .
+      dockerfile: ./docker/app/Dockerfile
+    ports: 
+      - "4000:4000"
+    depends_on:
+      - db
+    command: ./app
+    restart: on-failure
