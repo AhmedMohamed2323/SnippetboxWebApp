@@ -1,24 +1,139 @@
 version: 2.1
 
+orbs:
+  aws-ecr: circleci/aws-ecr@7.2.0
+  slack: circleci/slack@4.4.4
+  go: circleci/go@1.7.0
+  cypress: cypress-io/cypress@1.29.0
+
+executors:
+  machine_no_dlc:
+    machine:
+      image: ubuntu-2004:202107-02
+  machine_with_dlc:
+    machine:
+      image: ubuntu-2004:202107-02
+      docker_layer_caching: true
+  go_docker:
+    docker:
+      - image: cimg/go:1.17.1
+        auth: 
+          username: $DOCKER_USERNAME
+          password: $DOCKER_PASS
+
+commands:
+  build_container:
+    description: Start container and verify
+    steps:
+      - run:
+          name: Build container
+          command: |
+            echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
+            docker-compose build
+  start_container_and_verify:
+    description: Start container and verify
+    steps:
+      - run:
+          name: Start container and verify
+          command: |
+            echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
+            docker-compose up -d
+
+
 jobs:
   build:
-    docker:
-      - image: cimg/go:1.16
-        auth:
-          username: mydockerhub-user
-          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+    executor: machine_no_dlc
     steps:
       - checkout
-      - run: go build
+      - build_container
+
+  lint:
+    executor: go_docker
+    steps:
+      - checkout
       - run:
-          name: "Create a temp directory for artifacts"
-          command: |
-            mkdir -p /tmp/artifacts
+          name: Lint the Go cmd/web
+          command: gofmt -d ./cmd/web
       - run:
+          name: Lint the Go pkg/
+          command: gofmt -d ./pkg
+  unit-tests:
+    executor: machine_no_dlc
+    steps:
+      - checkout
+      - run: mkdir /tmp/code_coverage/
+      - start_container_and_verify
+      - run: 
+          name: Run cmd/web Go unit tests with coverage
           command: |
-            go test -coverprofile=c.out
-            go tool cover -html=c.out -o coverage.html
-            mv coverage.html /tmp/artifacts
+              until [ 'docker inspect -f {{.State.Running}} database', true ]
+              do sleep 10
+              done
+      - run:
+          name: Run cmd/web Go unit tests with coverage
+          command: go test -v ./cmd/web -coverprofile=/tmp/code_coverage/profile.out ./...
       - store_artifacts:
-          path: /tmp/artifacts
+          path: /tmp/code_coverage/profile.out
+  # code-coverage:
+  #   executor: go_docker
+  #   steps:
+  #     - checkout
+  #     - run: mkdir /tmp/code_coverage/
+  #     - run:
+  #         name: Run code coverage
+  #         command: go test -coverprofile=/tmp/code_coverage/profile.out ./...
+  #     - store_artifacts:
+  #         path: /tmp/code_coverage/profile.out
+  go-static-analyzer:
+    executor: go_docker
+    steps:
+      - checkout
+      - run:
+          name: Run static analyzer on cmd/web
+          command: go vet ./cmd/web
+      - run:
+          name: Run static analyzer on pgk
+          command: |
+                    go vet ./pkg/forms
+                    go vet ./pkg/models
+                    go vet ./pkg/models/mock
+                    go vet ./pkg/models/mysql
+  deploy:
+    executor: machine_no_dlc
+    steps:
+      # - push-image:
+      #   - setup-remote-docker
+      #   - repo: #todo create context
+      - run: echo I'm going to deploy I promise
+
+workflows:
+  version: 2
+  build-test-and-deploy:
+    jobs:
+      - lint
+      # - code-coverage
+      - go-static-analyzer
+      - build
+      - unit-tests:
+          requires:
+            - build
+            - lint
+            - go-static-analyzer
+      - cypress/run:
+          executor: machine_no_dlc
+          store_artifacts: true
+          start: docker-compose up -d
+          wait-on: https://localhost:4000
+          requires:
+            - build
+            - lint
+            - go-static-analyzer
+      - deploy:
+          requires:
+            - unit-tests
+            - cypress/run
+          filters:
+            branches:
+              only:
+                - main
 
