@@ -19,29 +19,23 @@ executors:
           password: $DOCKER_PASS
 
 commands:
-  build_container:
+  start_container_and_verify:
     description: Start container and verify
     steps:
       - run:
-          name: Build container
-          command: |
-            echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
-            docker-compose build
-  start_app:
-    description: Start app
-    steps:
-      - run:
-          name: Start app
+          name: Start container and verify
           command: |
             echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
             docker-compose up -d
+            docker run --network container:snippet \
+              appropriate/curl --retry 10 --retry-delay 1 --retry-connrefused http://localhost:4000 |
+
 jobs:
   build:
-    executor: machine_with_dlc
+    executor: machine_no_dlc
     steps:
       - checkout
-      - build_container
-
+      - start_container_and_verify
   lint:
     executor: go_docker
     steps:
@@ -53,32 +47,22 @@ jobs:
           name: Lint the Go pkg/
           command: gofmt -d ./pkg
   unit-tests:
-    executor: machine_with_dlc
+    executor: go_docker
+    steps:
+      - checkout
+      - run:
+          name: Run cmd/web Go unit tests
+          command: go test ./cmd/web
+  code-coverage:
+    executor: go_docker
     steps:
       - checkout
       - run: mkdir /tmp/code_coverage/
-      - start_app
-      - run: 
-          name: Run cmd/web Go unit tests with coverage
-          command: |
-              until docker inspect -f {{.State.Running}} database
-              do sleep 10
-              done
       - run:
-          name: Run cmd/web Go unit tests with coverage
-          command: go test -v ./cmd/web -coverprofile=/tmp/code_coverage/profile.out ./...
+          name: Run code coverage
+          command: go test -coverprofile=/tmp/code_coverage/profile.out ./...
       - store_artifacts:
           path: /tmp/code_coverage/profile.out
-  code-coverage:
-     executor: go_docker
-     steps:
-       - checkout
-       - run: mkdir /tmp/code_coverage/
-       - run:
-           name: Run code coverage
-           command: go test -coverprofile=/tmp/code_coverage/profile.out ./...
-       - store_artifacts:
-           path: /tmp/code_coverage/profile.out
   go-static-analyzer:
     executor: go_docker
     steps:
@@ -106,19 +90,15 @@ workflows:
   build-test-and-deploy:
     jobs:
       - lint
-      # - code-coverage
+      # - code coverage
       - go-static-analyzer
       - build
       - unit-tests:
           requires:
-            - build
             - lint
             - go-static-analyzer
       - cypress/run:
-          executor: machine_with_dlc
           store_artifacts: true
-          start: docker-compose up -d
-          wait-on: https://localhost:4000
           requires:
             - build
             - lint
@@ -131,5 +111,4 @@ workflows:
             branches:
               only:
                 - main
-
 
