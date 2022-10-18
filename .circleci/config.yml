@@ -1,33 +1,5 @@
 version: 2.1
 
-
-executors:
-  machine_no_dlc:
-    machine:
-      image: ubuntu-2004:202107-02
-  machine_with_dlc:
-    machine:
-      image: ubuntu-2004:202107-02
-      docker_layer_caching: true
-  go_docker:
-    docker:
-      - image: cimg/go:1.17.1
-        auth: 
-          username: ahmedmo23
-          password: Waterbreak2323!
-
-commands:
-  start_container_and_verify:
-    description: Start container and verify
-    steps:
-      - run:
-          name: Start container and verify
-          command: |
-            echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
-            docker-compose up -d
-            docker run --network container:snippet \
-              appropriate/curl --retry 10 --retry-delay 1 --retry-connrefused http://localhost:4000 |
-
 jobs:
   build:
     executor: machine_no_dlc
