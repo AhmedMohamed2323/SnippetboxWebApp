@@ -50,7 +50,7 @@ jobs:
           command: echo $MY_ENV_VAR
     
 workflows:
-  my-workflow:
+  build-test:
     jobs:
       - build
       - lint
