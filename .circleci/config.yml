@@ -57,19 +57,13 @@ jobs:
 
 workflows:
   version: 2
-  build-test-and:
+  test:
     jobs:
       - lint
       # - code-coverage
       - go-static-analyzer
       - build
       - unit-tests:
-          requires:
-            - build
-            - lint
-            - go-static-analyzer
-      - cypress/run:
-          store_artifacts: true
           requires:
             - build
             - lint
