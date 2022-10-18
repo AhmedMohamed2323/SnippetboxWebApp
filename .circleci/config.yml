@@ -1,19 +1,13 @@
 version: 2.1
 
-workflows:
-  my-workflow:
-    jobs:
-      - lint
-      - unit-tests
-      - go-static-analyzer
-      - run-tests:
-          context:
-            - org-global
-            - my-context
 
 jobs:
+  build:
+    executor: cimg/base:2020.01 
+    steps:
+      - checkout
   lint:
-    executor: go_docker
+    executor: cimg/base:2020.01
     steps:
       - checkout
       - run:
@@ -23,14 +17,14 @@ jobs:
           name: Lint the Go pkg/
           command: gofmt -d ./pkg
   unit-tests:
-    executor: go_docker
+    executor: cimg/base:2020.01
     steps:
       - checkout
       - run:
           name: Run cmd/web Go unit tests
           command: go test ./cmd/web
   go-static-analyzer:
-    executor: go_docker
+    executor: cimg/base:2020.01
     steps:
       - checkout
       - run:
@@ -54,3 +48,15 @@ jobs:
       - run:
           name: "echo environment variables from org-global context"
           command: echo $MY_ENV_VAR
+    
+workflows:
+  my-workflow:
+    jobs:
+      - build
+      - lint
+      - unit-tests
+      - go-static-analyzer
+      - run-tests:
+          context:
+            - org-global
+            - my-context
