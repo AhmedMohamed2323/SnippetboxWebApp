@@ -1,7 +1,5 @@
 version: 2.1
 
-orbs:
-  cypress: cypress-io/cypress@1.29.0
 
 executors:
   machine_no_dlc:
@@ -97,16 +95,7 @@ workflows:
           requires:
             - lint
             - go-static-analyzer
-      - cypress/run:
-          store_artifacts: true
-          requires:
-            - build
-            - lint
-            - go-static-analyzer
       - deploy:
-          requires:
-            - unit-tests
-            - cypress/run
           filters:
             branches:
               only:
