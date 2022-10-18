@@ -1,6 +1,16 @@
 version: 2.1
 
-
+workflows:
+  build-test:
+    jobs:
+      - build
+      - lint
+      - unit-tests
+      - go-static-analyzer
+      - run-tests:
+          context:
+            - org-global
+            - my-context
 jobs:
   build:
     executor: cimg/base:2020.01 
@@ -49,14 +59,3 @@ jobs:
           name: "echo environment variables from org-global context"
           command: echo $MY_ENV_VAR
     
-workflows:
-  build-test:
-    jobs:
-      - build
-      - lint
-      - unit-tests
-      - go-static-analyzer
-      - run-tests:
-          context:
-            - org-global
-            - my-context
