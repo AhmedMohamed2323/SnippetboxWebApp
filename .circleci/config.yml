@@ -1,7 +1,7 @@
 version: 2.1
 
 workflows:
-  build-test:
+  build and run-tests:
     jobs:
       - build
       - lint
