@@ -1,11 +1,9 @@
 version: 2.1
 
+orbs:
+  ruby: circleci/ruby@1.8.0
+
 jobs:
-  build:
-    executor: machine_no_dlc
-    steps:
-      - checkout
-      - start_container_and_verify
   lint:
     executor: go_docker
     steps:
