@@ -13,8 +13,8 @@ jobs:
     docker:
       - image: cimg/base:2020.01
         auth:
-          username: ahmedmo23
-          password: Waterbreak2323!  # context / project UI env-var reference
+          username: DockUsername
+          password: DockerPassword #context / project UI env-var reference
     steps:
       - checkout
       - run:
