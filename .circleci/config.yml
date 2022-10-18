@@ -8,8 +8,42 @@ jobs:
       - checkout # check out the code in the project directory
       - run: echo "hello world" # run the `echo` command
 
+  lint:
+    executor: cimg/base:2022.03
+    steps:
+      - checkout
+      - run:
+          name: Lint the Go cmd/web
+          command: gofmt -d ./cmd/web
+      - run:
+          name: Lint the Go pkg/
+          command: gofmt -d ./pkg
+  unit-tests:
+    executor: cimg/base:2022.03
+    steps:
+      - checkout
+      - run:
+          name: Run cmd/web Go unit tests
+          command: go test ./cmd/web
+  go-static-analyzer:
+    executor: cimg/base:2022.03
+    steps:
+      - checkout
+      - run:
+          name: Run static analyzer on cmd/web
+          command: go vet ./cmd/web
+      - run:
+          name: Run static analyzer on pgk
+          command: |
+                    go vet ./pkg/forms
+                    go vet ./pkg/models
+                    go vet ./pkg/models/mock
+                    go vet ./pkg/models/mysql
+
 workflows:
-  build-workflow:
+  build-test-deploy:
     jobs:
       - build
-
+      - lint
+      - unit-tests
+      - go-static-analyzer
