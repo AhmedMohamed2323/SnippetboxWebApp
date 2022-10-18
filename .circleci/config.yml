@@ -47,13 +47,6 @@ jobs:
                     go vet ./pkg/models
                     go vet ./pkg/models/mock
                     go vet ./pkg/models/mysql
-  deploy:
-    executor: machine_no_dlc
-    steps:
-      # - push-image:
-      #   - setup-remote-docker
-      #   - repo: #todo create context
-      - run: echo I'm going to deploy I promise
 
 workflows:
   version: 2
@@ -62,10 +55,8 @@ workflows:
       - lint
       # - code-coverage
       - go-static-analyzer
-      - build
       - unit-tests:
           requires:
-            - build
             - lint
             - go-static-analyzer
           filters:
