@@ -41,9 +41,19 @@ jobs:
                     go vet ./pkg/models/mysql
 
 workflows:
+  version: 2
   build-test-deploy:
     jobs:
       - build
       - lint
-      - unit-tests
       - go-static-analyzer
+      - build
+      - unit-tests:
+          requires:
+            - lint
+            - go-static-analyzer
+      - deploy:
+          filters:
+            branches:
+              only:
+                - main
