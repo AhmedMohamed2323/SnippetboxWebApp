@@ -1,51 +1,7 @@
 version: 2.1
 
-orbs:
-
-  cypress: cypress-io/cypress@1.29.0
-
-executors:
-  machine_no_dlc:
-    machine:
-      image: ubuntu-2004:202107-02
-  machine_with_dlc:
-    machine:
-      image: ubuntu-2004:202107-02
-      docker_layer_caching: true
-  go_docker:
-    docker:
-      - image: cimg/go:1.17.1
-        auth: 
-          username: $ahmedmo23
-          password: $Waterbreak2323!
-
-commands:
-  build_container:
-    description: Start container and verify
-    steps:
-      - run:
-          name: Build container
-          command: |
-            echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
-            docker-compose build
-  start_container_and_verify:
-    description: Start container and verify
-    steps:
-      - run:
-          name: Start container and verify
-          command: |
-            echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
-            docker-compose up -d
-            sleep 10
-            docker inspect -f {{.State.Running}} snippetbox
-
 
 jobs:
-  build:
-    executor: machine_no_dlc
-    steps:
-      - checkout
-      - build_container
   lint:
     executor: go_docker
     steps:
