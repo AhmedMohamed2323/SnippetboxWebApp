@@ -1,6 +1,21 @@
 version: 2.1
 
 
+executors:
+  machine_no_dlc:
+    machine:
+      image: ubuntu-2004:202107-02
+  machine_with_dlc:
+    machine:
+      image: ubuntu-2004:202107-02
+      docker_layer_caching: true
+  go_docker:
+    docker:
+      - image: cimg/go:1.17.1
+        auth: 
+          username: $Docker_User
+          password: $Docker_Pass
+
 commands:
   start_container_and_verify:
     description: Start container and verify
@@ -8,11 +23,17 @@ commands:
       - run:
           name: Start container and verify
           command: |
-            echo $Docker_Pass | docker login -u $Docker_User --password-stdin
+            echo $DOCKER_PASS | docker login -u $DOCKER_USERNAME --password-stdin
             docker-compose up -d
-
+            docker run --network container:snippet \
+              appropriate/curl --retry 10 --retry-delay 1 --retry-connrefused http://localhost:4000 |
 
 jobs:
+  build:
+    executor: machine_no_dlc
+    steps:
+      - checkout
+      - start_container_and_verify
   lint:
     executor: go_docker
     steps:
@@ -30,16 +51,16 @@ jobs:
       - run:
           name: Run cmd/web Go unit tests
           command: go test ./cmd/web
-  #code-coverage:
-    # executor: go_docker
-    # steps:
-    #   - checkout
-    #   - run: mkdir /tmp/code_coverage/
-    #   - run:
-    #       name: Run code coverage
-    #       command: go test -coverprofile=/tmp/code_coverage/profile.out ./...
-    #   - store_artifacts:
-    #       path: /tmp/code_coverage/profile.out
+  code-coverage:
+    executor: go_docker
+    steps:
+      - checkout
+      - run: mkdir /tmp/code_coverage/
+      - run:
+          name: Run code coverage
+          command: go test -coverprofile=/tmp/code_coverage/profile.out ./...
+      - store_artifacts:
+          path: /tmp/code_coverage/profile.out
   go-static-analyzer:
     executor: go_docker
     steps:
@@ -60,9 +81,10 @@ jobs:
       # - push-image//
       #   - setup-remote-docker
       #   - repo: #todo create context
-      - run: echo "I'm going to deploy I promise"
+      - run: "echo I'm going to deploy I promise"
 
 workflows:
+  version: 2
   build-test-and-deploy:
     jobs:
       - lint
