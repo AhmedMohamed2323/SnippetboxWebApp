@@ -7,9 +7,6 @@ workflows:
           context:
             - org-global
             - my-context
-            - lint
-            - unit-tests
-            
 
 jobs:
   run-tests:
@@ -34,8 +31,8 @@ jobs:
           name: Lint the Go pkg/
           command: gofmt -d ./pkg
     unit-tests:
-      executor: go_docker
-      steps:
+      - image: cimg/base:2020.01
+        steps:
       - checkout
       - run:
           name: Run cmd/web Go unit tests
