@@ -81,7 +81,7 @@ jobs:
       # - push-image//
       #   - setup-remote-docker
       #   - repo: #todo create context
-      - run: "echo I'm going to deploy I promise"
+      - run: echo "I'm going to deploy I promise"
 
 workflows:
   version: 2
