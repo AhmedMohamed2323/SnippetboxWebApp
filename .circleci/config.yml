@@ -7,6 +7,9 @@ workflows:
           context:
             - org-global
             - my-context
+            - lint
+            - unit-tests
+            
 
 jobs:
   run-tests:
@@ -20,5 +23,21 @@ jobs:
       - run:
           name: "echo environment variables from org-global context"
           command: echo $MY_ENV_VAR
-
+    lint:
+      - image: cimg/base:2020.01
+        steps:
+      - checkout
+      - run:
+          name: Lint the Go cmd/web
+          command: gofmt -d ./cmd/web
+      - run:
+          name: Lint the Go pkg/
+          command: gofmt -d ./pkg
+    unit-tests:
+      executor: go_docker
+      steps:
+      - checkout
+      - run:
+          name: Run cmd/web Go unit tests
+          command: go test ./cmd/web
     
