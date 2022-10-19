@@ -63,11 +63,12 @@ jobs:
       - run: echo "I'm going to deploy I promise"
 
 workflows:
-  test-and-deploy:
+  build-test-and-deploy:
     jobs:
       - lint
       # code coverage
       - go-static-analyzer
+      - build
       - unit-tests:
           requires:
             - lint
