@@ -1,21 +1,6 @@
 version: 2.1
 
 
-executors:
-  machine_no_dlc:
-    machine:
-      image: ubuntu-2004:202107-02
-  machine_with_dlc:
-    machine:
-      image: ubuntu-2004:202107-02
-      docker_layer_caching: true
-  go_docker:
-    docker:
-      - image: cimg/go:1.17.1
-        auth: 
-          username: $Docker_Pass
-          password: $Docker_User
-
 commands:
   start_container_and_verify:
     description: Start container and verify
@@ -28,11 +13,6 @@ commands:
 
 
 jobs:
-  build:
-    executor: machine_no_dlc
-    steps:
-      - checkout
-      - start_container_and_verify
   lint:
     executor: go_docker
     steps:
@@ -83,12 +63,11 @@ jobs:
       - run: echo "I'm going to deploy I promise"
 
 workflows:
-  build-test-and-deploy:
+  test-and-deploy:
     jobs:
       - lint
       # code coverage
       - go-static-analyzer
-      - build
       - unit-tests:
           requires:
             - lint
