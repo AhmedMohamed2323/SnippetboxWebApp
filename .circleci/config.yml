@@ -90,7 +90,6 @@ workflows:
       - lint
       # code coverage
       - go-static-analyzer
-      - build
       - unit-tests:
           requires:
             - lint
