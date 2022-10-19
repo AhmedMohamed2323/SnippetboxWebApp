@@ -2,6 +2,13 @@ version: 2.1
 
 
 executors:
+  machine_no_dlc:
+    machine:
+      image: ubuntu-2004:202107-02
+  machine_with_dlc:
+    machine:
+      image: ubuntu-2004:202107-02
+      docker_layer_caching: true
   go_docker:
     docker:
       - image: cimg/go:1.17.1
@@ -16,7 +23,7 @@ commands:
       - run:
           name: Start container and verify
           command: |
-            echo $Docker_Pass | docker login -u $Docker_Pass --password-stdin
+            echo $Docker_Pass | docker login -u $Docker_User --password-stdin
             docker-compose up -d
 
 
