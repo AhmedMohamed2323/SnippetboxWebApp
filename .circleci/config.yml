@@ -1,34 +1,25 @@
 version: 2.1
-orbs:
-    node: circleci/node@3.0.1
+
 jobs:
-    build-and-test:
-        docker:
-            - image: cimg/node:12.16
-        resource_class: small
-        parallelism: 5
-        steps:
-            - checkout
-            - node/install-packages:
-                pkg-manager: yarn      
-            - run: mkdir ~/junit
-            - run:
-                name: Test application
-                command: |
-                    TEST=$(cat classnames.txt | circleci tests split --split-by=timings --timings-type=classname)
-                    echo $TEST
-                    yarn test $TEST
-            - run:
-                command: cp junit.xml ~/junit/
-                when: always
-            - store_test_results:
-                path: ~/junit    
-            - store_artifacts:
-                path: ~/junit       
+  test:
+    docker:
+      - image: cimg/base:2022.03
+    parallelism: 5
+    steps:
+      - checkout
+      # These two tests should run in parallel. Make it so!
+      - run:
+          name: Run Hello test
+          command: |
+            bash src/test_hello.sh
+      - run:
+          name: Run Goodbye test
+          command: |
+            bash src/test_goodbye.sh
 workflows:
-    build-and-test:
-      jobs:
-        - build-and-test
+  test-workflow:
+    jobs:
+      - test
 
 
 
