@@ -4,16 +4,20 @@ orbs:
 jobs:
   build:
     docker:
-      - image: cimg/openjdk:17.0-browsers
+      - image: cimg/node:17.2-browsers
         auth:
           username: $Docker_User
           password: $Docker_Password  # context / project UI env-var reference
     steps:
       - checkout
       - browser-tools/install-browser-tools
-      - run : mvn test
+      - run: npm install
+      - run:
+          name: "Run Jest and Collect Coverage Reports"
+          command: jest --collectCoverage=true
       - store_artifacts:
-          path:  target
+          path: coverage
+
 
 
 
