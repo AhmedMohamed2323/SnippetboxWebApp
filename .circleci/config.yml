@@ -294,23 +294,7 @@ workflows:
   feature_jobs:
     jobs:
       - save_and_restore_cache
-            - check_if_environment_is_gcp
-      - android_machine:
-          requires:
-            - check_if_environment_is_gcp
-
-  feature_jobs:
-    jobs:
-      - save_and_restore_cache
       - contexts:
-          context: org-global
-      - multi-contexts:
-          context: individual-local
-      - write_workspace
-      - read_workspace:
-          requires:
-            - write_workspace
-      - artifacts_test_results- contexts:
           context: org-global
       - multi-contexts:
           context: individual-local
