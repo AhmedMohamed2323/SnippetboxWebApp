@@ -1,24 +1,34 @@
 version: 2.1
-
 orbs:
-  browser-tools: circleci/browser-tools@1.4.0
-
+    node: circleci/node@3.0.1
 jobs:
-  build:
-    docker:
-      - image: cimg/node:17.2-browsers
-        auth:
-          username: $Docker_User
-          password: $Docker_Password  # context / project UI env-var reference
-    steps:
-      - checkout
-      - browser-tools/install-browser-tools
-      - run: npm install
-      - run:
-          name: "Run Jest and Collect Coverage Reports"
-          command: jest --collectCoverage=true
-      - store_artifacts:
-          path: coverage
+    build-and-test:
+        docker:
+            - image: cimg/node:12.16
+        resource_class: small
+        parallelism: 5
+        steps:
+            - checkout
+            - node/install-packages:
+                pkg-manager: yarn      
+            - run: mkdir ~/junit
+            - run:
+                name: Test application
+                command: |
+                    TEST=$(cat classnames.txt | circleci tests split --split-by=timings --timings-type=classname)
+                    echo $TEST
+                    yarn test $TEST
+            - run:
+                command: cp junit.xml ~/junit/
+                when: always
+            - store_test_results:
+                path: ~/junit    
+            - store_artifacts:
+                path: ~/junit       
+workflows:
+    build-and-test:
+      jobs:
+        - build-and-test
 
 
 
