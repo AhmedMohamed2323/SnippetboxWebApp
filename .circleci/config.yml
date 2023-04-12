@@ -8,8 +8,8 @@ jobs:
       - checkout
       - run: go version
       - run: go build ./cmd/web
+      - run: run cypress test ./cpyress
 workflows:
   main:
     jobs:
       - build
-
