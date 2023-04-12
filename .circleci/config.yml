@@ -5,6 +5,7 @@ jobs:
     docker:
       - image: cimg/go:1.19.5
     steps:
+      - checkout
       - run: go version
       - run: go build ./cmd/web
 workflows:
