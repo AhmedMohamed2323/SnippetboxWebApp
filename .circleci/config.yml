@@ -12,7 +12,7 @@ jobs:
     docker:
       - image: cimg/go:1.19.5
     steps:
-      - run: run cypress test ./cypress
+      - run: cypress test ./cypress
 workflows:
   main:
     jobs:
