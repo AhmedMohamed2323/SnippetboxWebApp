@@ -9,5 +9,5 @@ require (
 	github.com/justinas/nosurf v1.1.1 
 	github.com/golangcollege/sessions v1.2.0
 	golang.org/x/crypto v0.0.0-20200317142112-1b76d66859c6 // 
-	golang.org/x/sys v0.0.0-20190412213103-97732733099d // indirect
+	golang.org/x/sys v0.0.0-20190412213103-97732733099d // indirect....
 )
