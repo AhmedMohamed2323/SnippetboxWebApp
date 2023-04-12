@@ -6,14 +6,13 @@ jobs:
       - image: cimg/go:1.19.5
     steps:
       - run: go version
-      - run: go build ./cmd/web
+      - run:
+          name: go build
+          command: <<include(go.mod)>>
 workflows:
   main:
     jobs:
       - build
-
-
-
 
 
 # VS Code Extension Version: 1.0.0
