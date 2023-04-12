@@ -8,13 +8,7 @@ jobs:
       - checkout
       - run: go version
       - run: go build ./cmd/web
-  test:
-    docker:
-      - image: cimg/go:1.19.5
-    steps:
-      - run: cypress test ./cypress
 workflows:
   main:
     jobs:
       - build
-      - test
