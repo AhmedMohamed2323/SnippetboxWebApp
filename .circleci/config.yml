@@ -11,6 +11,10 @@ jobs:
 
       - run: npm install
 
+      - run:
+          name: install libnss3
+          command: sudo apt-get install libnss3
+      
       # run tests!!!
       - run:
           name: Cypress Test
