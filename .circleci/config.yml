@@ -10,6 +10,10 @@ jobs:
       - checkout
       # run tests!!!
       - run:
+          name: install dayjs
+          command: npm install dayjs
+
+      - run:
           name: Cypress Test
           command: ./node_modules/.bin/cypress run 
 ##
