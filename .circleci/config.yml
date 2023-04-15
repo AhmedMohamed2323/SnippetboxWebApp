@@ -35,7 +35,7 @@ jobs:
           at: ~/repo
       - run:
           name: Authenticate with NPM
-          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
+          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/node_modules
       - run:
           name: Publish package
           command: npm publish --access public
