@@ -9,23 +9,12 @@ jobs:
     steps:
       - checkout
 
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "package.json" }}
-            - v1-dependencies-
-
       - run: npm install
-
-      - save_cache:
-          paths:
-            - node_modules
-          key: v1-dependencies-{{ checksum "package.json" }}
 
       # run tests!!!
       - run:
           name: Cypress Test
           command: ./node_modules/.bin/cypress run
-
 
   deploy:
     docker:
@@ -34,8 +23,6 @@ jobs:
     working_directory: ~/repo
 
     steps:
-      - attach_workspace:
-          at: ~/repo
       - run:
           name: Authenticate with NPM
           command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
