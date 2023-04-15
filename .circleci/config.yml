@@ -23,10 +23,44 @@ jobs:
             - ~/.cache/Cypress
           
       - run:
-          name: Install missing depedencies
-          command: sudo apt-get update
-                   sudo apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
-
+          name: Install missing dependencies
+          command: sudo apt-get install -y libgtk2.0-0
+      - run:
+          name: Install missing dependencies
+          command: sudo apt-get install -y libgtk2.0-0 
+      - run:
+          name: Install missing dependencies
+          command: sudo apt-get install -y libgtk-3-0
+      - run:
+          name: Install missing dependencies
+          command: sudo apt-get install -y libgbm-dev
+      - run:
+          name: Install missing dependencies
+          command: sudo apt-get install -y libnotify-dev
+      - run:
+          name: Install missing dependencies
+          command: sudo apt-get install -y libgconf-2-4
+      - run:
+          name: Install missing dependencies
+          command: sudo apt-get install -y libnss3 
+      - run:
+          name: Install missing dependencies
+          command: sudo apt-get install -y libgconf-2-4
+      - run:
+          name: Install missing dependencies
+          command: sudo apt-get install -y libxss1
+      - run:
+          name: Install missing dependencies
+          command: sudo apt-get install -y libasound2
+      - run:
+          name: Install missing dependencies
+          command: sudo apt-get install -y libxtst6
+      - run:
+          name: Install missing dependencies
+          command: sudo apt-get install -y xauth
+      - run:
+          name: Install missing dependencies
+          command: sudo apt-get install -y xvfb
       - run:
           name: Cypress Test
           command: ./node_modules/.bin/cypress run 
