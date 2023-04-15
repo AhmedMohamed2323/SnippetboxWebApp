@@ -21,7 +21,7 @@ jobs:
       # run tests!!!
       - run:
           name: Cypress Test
-          command: ./Users/ahmedmohamed/Desktop/Git-SnippetBoxWebApp/SnippetboxWebApp/cypress run
+          command: ./SnippetboxWebApp/cypress run
 
 #
   deploy:
