@@ -21,7 +21,8 @@ jobs:
       # run tests!!!
       - run:
           name: Cypress Test
-          command: ./node_modules/.bin/cypress run
+          command: ./Users/ahmedmohamed/Desktop/Git-SnippetBoxWebApp/SnippetboxWebApp/cypress run
+
 #
   deploy:
     docker:
