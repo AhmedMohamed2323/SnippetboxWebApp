@@ -21,7 +21,15 @@ jobs:
           key: cypress-cache-{{ checksum "package-lock.json" }}
           paths:
             - ~/.cache/Cypress
+          
+      - run:
+          name: Install missing depedencies
+          command: sudo apt-get update
+                   sudo apt-get install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
 
+      - run:
+          name: Cypress Test
+          command: ./node_modules/.bin/cypress run 
 
   deploy:
     docker:
@@ -36,7 +44,7 @@ jobs:
       - run:
           name: Publish package
           command: npm publish --access public
-#
+
 workflows:
   version: 2
   build:
